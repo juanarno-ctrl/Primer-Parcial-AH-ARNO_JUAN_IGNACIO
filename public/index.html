@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pokémon Gen VI – API + Frontend</title>
+  <link rel="stylesheet" href="/app.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Pokémon Gen VI</div>
+    <nav class="actions">
+      <button id="btnLogin">Iniciar sesión</button>
+      <button id="btnRegister" class="secondary">Registrarse</button>
+      <button id="btnLogout" class="danger" hidden>Cerrar sesión</button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>Filtros</h2>
+      <form id="filters" class="grid">
+        <label>Nombre
+          <input type="text" id="fName" placeholder="greninja, chesnaught..." />
+        </label>
+        <label>Tipo
+          <input type="text" id="fType" placeholder="Water, Fairy..." />
+        </label>
+        <label>Ataque (mín)
+          <input type="number" id="fMinAtk" min="0" />
+        </label>
+        <label>Velocidad (máx)
+          <input type="number" id="fMaxSpd" min="0" />
+        </label>
+        <label>Página
+          <input type="number" id="fPage" min="1" value="1" />
+        </label>
+        <label>Límite
+          <input type="number" id="fLimit" min="1" max="100" value="10" />
+        </label>
+        <div class="grid-row">
+          <button type="submit">Aplicar</button>
+          <button type="reset" id="btnReset" class="secondary">Limpiar</button>
+        </div>
+      </form>
+      <div class="notice">Tip: combiná filtros, por ejemplo: nombre = <code>greninja</code>, tipo = <code>Water</code>, Atk ≥ <code>90</code>.</div>
+    </section>
+
+    <section class="card">
+      <div class="list-header">
+        <h2>Pokémon (Gen VI)</h2>
+        <button id="btnNew" class="primary" hidden>+ Nuevo Pokémon</button>
+      </div>
+      <div id="results"></div>
+      <div id="pager" class="pager"></div>
+    </section>
+
+    <section id="typesCard" class="card">
+      <h2>Tipos (búsqueda)</h2>
+      <form id="typesSearch" class="row">
+        <input type="text" id="typeQuery" placeholder="fi (Fire, Fighting...)" />
+        <button>Buscar tipos</button>
+      </form>
+      <div id="typesList"></div>
+    </section>
+  </main>
+
+  <!-- Diálogo CRUD -->
+  <dialog id="dlgPokemon" class="dialog">
+    <form method="dialog" id="frmPokemon" class="form">
+      <h3 id="dlgTitle">Nuevo Pokémon</h3>
+      <input type="hidden" id="pkId" />
+      <label>Nombre
+        <input type="text" id="pkName" required minlength="2" />
+      </label>
+      <label>Número Nacional (nat_dex)
+        <input type="number" id="pkDex" required min="1" />
+      </label>
+      <div class="grid-2">
+        <label>HP <input type="number" id="sHp" required min="1" /></label>
+        <label>Atk <input type="number" id="sAtk" required min="1" /></label>
+        <label>Def <input type="number" id="sDef" required min="1" /></label>
+        <label>SpA <input type="number" id="sSpA" required min="1" /></label>
+        <label>SpD <input type="number" id="sSpD" required min="1" /></label>
+        <label>Spe <input type="number" id="sSpe" required min="1" /></label>
+      </div>
+      <label>Tipos (separados por coma)
+        <input type="text" id="pkTypes" placeholder="Water, Dark" />
+      </label>
+      <menu class="dialog-actions">
+        <button value="cancel" class="secondary">Cancelar</button>
+        <button id="btnSave" value="default" class="primary">Guardar</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <!-- Diálogo Login -->
+  <dialog id="dlgLogin" class="dialog">
+    <form method="dialog" id="frmLogin" class="form">
+      <h3>Iniciar sesión</h3>
+      <label>Email <input type="email" id="lgEmail" required /></label>
+      <label>Contraseña <input type="password" id="lgPass" required minlength="6" /></label>
+      <menu class="dialog-actions">
+        <button value="cancel" class="secondary">Cancelar</button>
+        <button id="btnDoLogin" value="default" class="primary">Entrar</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <!-- Diálogo Registro -->
+  <dialog id="dlgRegister" class="dialog">
+    <form method="dialog" id="frmRegister" class="form">
+      <h3>Registrarse</h3>
+      <label>Nombre <input type="text" id="rgName" required minlength="2" /></label>
+      <label>Email <input type="email" id="rgEmail" required /></label>
+      <label>Contraseña <input type="password" id="rgPass" required minlength="6" /></label>
+      <menu class="dialog-actions">
+        <button value="cancel" class="secondary">Cancelar</button>
+        <button id="btnDoRegister" value="default" class="primary">Crear cuenta</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <footer class="footer">
+    <strong>Trabajo Práctico – API RESTful</strong>
+    <div>Nombre y Apellido:  <em>Juan Ignacio Arno</em></div>
+    <div>Materia: <em>Aplicaciones Hibridas</em></div>
+    <div>Docente: <em>Jonathan Emanuel Cruz</em></div>
+    <div>Comisión: <em>DWM2BP</em></div>
+  </footer>
+
+  <script src="/app.js" type="module"></script>
+</body>
+</html>
+

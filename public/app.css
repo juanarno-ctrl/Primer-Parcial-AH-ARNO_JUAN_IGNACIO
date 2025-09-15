@@ -1,0 +1,31 @@
+:root{--bg:#0b1220;--panel:#111827;--muted:#9ca3af;--text:#e5e7eb;--primary:#60a5fa;--danger:#f87171;--ok:#34d399;--border:#374151}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial}
+.container{max-width:1100px;margin:0 auto;padding:1rem}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:.8rem 1rem;border-bottom:1px solid var(--border);background:#0f172a;position:sticky;top:0;z-index:10}
+.brand{font-weight:700}
+.actions button{margin-left:.5rem}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:1rem;margin:1rem 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem}
+.grid-row{display:flex;gap:.5rem;align-items:center}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(120px,1fr));gap:.75rem}
+.row{display:flex;gap:.5rem}
+input,button{padding:.6rem .7rem;border-radius:8px;border:1px solid var(--border);background:#0f172a;color:var(--text)}
+button{cursor:pointer}
+button.primary{background:var(--primary);border-color:transparent;color:#0b1220;font-weight:600}
+button.secondary{background:#0f172a}
+button.danger{background:var(--danger);border-color:transparent;color:#111}
+button[hidden]{display:none}
+.list-header{display:flex;justify-content:space-between;align-items:center}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{border-bottom:1px solid var(--border);padding:.6rem;text-align:left}
+.badge{display:inline-block;padding:.15rem .5rem;border:1px solid var(--border);border-radius:999px;margin-right:.25rem;font-size:.8rem;color:var(--muted)}
+.pager{display:flex;gap:.5rem;align-items:center;justify-content:flex-end;margin-top:1rem}
+.footer{margin:2rem 0;padding:1rem;border-top:1px solid var(--border);text-align:center;color:var(--muted)}
+.notice{padding:.6rem .8rem;border:1px solid var(--border);border-radius:8px;background:#0f172a;color:var(--muted);margin:.5rem 0}
+dialog.dialog{border:none;border-radius:12px;padding:0;max-width:520px;width:92%}
+.form{padding:1rem;background:var(--panel);border:1px solid var(--border);border-radius:12px}
+.dialog-actions{display:flex;justify-content:flex-end;gap:.5rem;margin-top:.75rem}
+.empty{color:var(--muted);font-style:italic;padding:.4rem 0}
+.err{color:var(--danger);font-weight:600}
+.ok{color:var(--ok);font-weight:600}

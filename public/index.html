@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
@@ -63,6 +63,99 @@
       </form>
       <div id="typesList"></div>
     </section>
+
+    <!-- 🔥 NUEVO: Comandos para Postman / cURL -->
+    <section class="card">
+      <h2>Comandos para Postman / cURL</h2>
+      <p>Base URL: <code>http://localhost:3000/api</code></p>
+      <div class="notice">Para <strong>POST / PATCH / DELETE</strong> necesitás token JWT: Header <code>Authorization: Bearer &lt;TU_TOKEN&gt;</code>. Obtenelo con <code>/auth/login</code>.</div>
+
+      <details open>
+        <summary><strong>Auth</strong> – Register &amp; Login</summary>
+        <p><strong>POST</strong> <code>/auth/register</code></p>
+<pre><code class="language-json">POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Juani",
+  "email": "juani@api.com",
+  "password": "123456"
+}
+</code></pre>
+
+        <p><strong>POST</strong> <code>/auth/login</code></p>
+<pre><code class="language-json">POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "juani@api.com",
+  "password": "123456"
+}
+</code></pre>
+        <p>Respuesta: <code>{ "token": "&lt;JWT&gt;" }</code></p>
+      </details>
+
+      <details>
+        <summary><strong>GET</strong> – Listado y detalle</summary>
+        <p><strong>GET</strong> <code>/pokemon</code></p>
+<pre><code>GET http://localhost:3000/api/pokemon</code></pre>
+
+        <p>Con filtros:</p>
+<pre><code>GET http://localhost:3000/api/pokemon?type=water&amp;min_attack=90
+GET http://localhost:3000/api/pokemon?name=greninja
+</code></pre>
+
+        <p><strong>GET</strong> <code>/pokemon/:id</code></p>
+<pre><code>GET http://localhost:3000/api/pokemon/&lt;ID&gt;</code></pre>
+      </details>
+
+      <details>
+        <summary><strong>POST</strong> – Crear Pokémon (JWT)</summary>
+<pre><code class="language-json">POST http://localhost:3000/api/pokemon
+Authorization: Bearer &lt;TU_TOKEN&gt;
+Content-Type: application/json
+
+{
+  "name": "Froakie",
+  "nat_dex": 656,
+  "generation": 6,
+  "stats": {
+    "hp": 30,
+    "attack": 25,
+    "defense": 15,
+    "sp_attack": 35,
+    "sp_defense": 16,
+    "speed": 37
+  },
+  "types": ["water"]
+}
+</code></pre>
+      </details>
+
+      <details>
+        <summary><strong>PATCH</strong> (PUT)</summary>
+<pre><code class="language-json">PATCH http://localhost:3000/api/pokemon/&lt;ID&gt;
+Authorization: Bearer &lt;TU_TOKEN&gt;
+Content-Type: application/json
+
+{
+  "name": "Froakie Evolucionado",
+  "stats": {
+    "hp": 40,
+    "attack": 30
+  }
+}
+</code></pre>
+      </details>
+
+      <details>
+        <summary><strong>DELETE</strong></summary>
+<pre><code>DELETE http://localhost:3000/api/pokemon/&lt;ID&gt;
+Authorization: Bearer &lt;TU_TOKEN&gt;
+</code></pre>
+      </details>
+    </section>
+    <!-- /NUEVO -->
   </main>
 
   <!-- Diálogo CRUD -->
@@ -88,7 +181,7 @@
         <input type="text" id="pkTypes" placeholder="Water, Dark" />
       </label>
       <menu class="dialog-actions">
-        <button value="cancel" class="secondary">Cancelar</button>
+        <button value="cancel" class="secondary" type="button" onclick="document.getElementById('dlgPokemon').close()">Cancelar</button>
         <button id="btnSave" value="default" class="primary">Guardar</button>
       </menu>
     </form>
@@ -101,7 +194,7 @@
       <label>Email <input type="email" id="lgEmail" required /></label>
       <label>Contraseña <input type="password" id="lgPass" required minlength="6" /></label>
       <menu class="dialog-actions">
-        <button value="cancel" class="secondary">Cancelar</button>
+        <button value="cancel" class="secondary" type="button" onclick="document.getElementById('dlgLogin').close()">Cancelar</button>
         <button id="btnDoLogin" value="default" class="primary">Entrar</button>
       </menu>
     </form>
@@ -115,7 +208,7 @@
       <label>Email <input type="email" id="rgEmail" required /></label>
       <label>Contraseña <input type="password" id="rgPass" required minlength="6" /></label>
       <menu class="dialog-actions">
-        <button value="cancel" class="secondary">Cancelar</button>
+        <button value="cancel" class="secondary" type="button" onclick="document.getElementById('dlgRegister').close()">Cancelar</button>
         <button id="btnDoRegister" value="default" class="primary">Crear cuenta</button>
       </menu>
     </form>
@@ -132,4 +225,3 @@
   <script src="/app.js" type="module"></script>
 </body>
 </html>
-

@@ -29,3 +29,168 @@ dialog.dialog{border:none;border-radius:12px;padding:0;max-width:520px;width:92%
 .empty{color:var(--muted);font-style:italic;padding:.4rem 0}
 .err{color:var(--danger);font-weight:600}
 .ok{color:var(--ok);font-weight:600}
+
+dialog#dlgPokemon {
+  background: #1e1e2f;        
+  color: #f5f5f5;             
+  border: 2px solid #444;     
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 500px;
+}
+
+/* títulos */
+dialog#dlgPokemon h2,
+dialog#dlgPokemon h3 {
+  color: #ffd369;             
+  margin-bottom: 1rem;
+}
+
+/* inputs */
+dialog#dlgPokemon input[type="text"],
+dialog#dlgPokemon input[type="number"] {
+  background: #2c2c40;
+  color: #ffffff;
+  border: 1px solid #666;
+  border-radius: 6px;
+  padding: 6px 10px;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+dialog#dlgPokemon input:disabled {
+  background: #3a3a50;
+  color: #bbbbbb;
+}
+
+/* botones */
+dialog#dlgPokemon button {
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 8px 14px;
+  margin: 4px;
+  cursor: pointer;
+}
+
+dialog#dlgPokemon button.primary {
+  background: #4CAF50;   
+  color: #fff;
+}
+
+dialog#dlgPokemon button.danger {
+  background: #e63946;   
+  color: #fff;
+}
+
+dialog#dlgPokemon button.secondary {
+  background: #888;
+  color: #fff;
+}
+/* ==== Modal de Pokémon (ya agregado antes, lo dejamos) ==== */
+dialog#dlgPokemon {
+  background: #1e1e2f;
+  color: #f5f5f5;
+  border: 2px solid #444;
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 500px;
+}
+
+dialog#dlgPokemon h2,
+dialog#dlgPokemon h3 {
+  color: #ffd369;
+  margin-bottom: 1rem;
+}
+
+dialog#dlgPokemon input[type="text"],
+dialog#dlgPokemon input[type="number"] {
+  background: #2c2c40;
+  color: #ffffff;
+  border: 1px solid #666;
+  border-radius: 6px;
+  padding: 6px 10px;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+dialog#dlgPokemon input:disabled {
+  background: #3a3a50;
+  color: #bbbbbb;
+}
+
+dialog#dlgPokemon button {
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 8px 14px;
+  margin: 4px;
+  cursor: pointer;
+}
+
+dialog#dlgPokemon button.primary {
+  background: #4CAF50;
+  color: #fff;
+}
+
+dialog#dlgPokemon button.danger {
+  background: #e63946;
+  color: #fff;
+}
+
+dialog#dlgPokemon button.secondary {
+  background: #888;
+  color: #fff;
+}
+
+/* ==== Modal de Login y Registro ==== */
+dialog#dlgLogin,
+dialog#dlgRegister {
+  background: #1e1e2f;   /* fondo oscuro */
+  color: #f5f5f5;        /* texto claro */
+  border: 2px solid #444;
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 400px;
+}
+
+dialog#dlgLogin h2,
+dialog#dlgRegister h2 {
+  color: #ffd369;         /* amarillo fuerte para títulos */
+  margin-bottom: 1rem;
+}
+
+dialog#dlgLogin input,
+dialog#dlgRegister input {
+  background: #2c2c40;
+  color: #ffffff;
+  border: 1px solid #666;
+  border-radius: 6px;
+  padding: 6px 10px;
+  width: 100%;
+  margin-bottom: 0.8rem;
+}
+
+dialog#dlgLogin input:focus,
+dialog#dlgRegister input:focus {
+  outline: 2px solid #ffd369;
+}
+
+dialog#dlgLogin button,
+dialog#dlgRegister button {
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 8px 14px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+dialog#dlgLogin button.primary,
+dialog#dlgRegister button.primary {
+  background: #4CAF50;
+  color: #fff;
+}
+
+dialog#dlgLogin button.secondary,
+dialog#dlgRegister button.secondary {
+  background: #888;
+  color: #fff;
+}

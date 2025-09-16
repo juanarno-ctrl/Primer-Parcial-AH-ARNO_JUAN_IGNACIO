@@ -1,12 +1,37 @@
 import { Router } from 'express';
 import { validationResult } from 'express-validator';
 import { authenticateToken } from '../middlewares/auth.js';
-import { createPokemonValidator, updatePokemonValidator, idParam, listQuery } from '../validators/pokemon.validators.js';
+import {
+  createPokemonValidator,
+  updatePokemonValidator,
+  listQuery
+} from '../validators/pokemon.validators.js';
 import Pokemon from '../models/Pokemon.js';
 
 const router = Router();
 
-// GET /api/pokemon
+// helper: aplanar un doc/obj con stats y normalizar id
+function flatten(p) {
+  const obj = typeof p.toObject === 'function' ? p.toObject() : { ...p };
+  const s = obj.stats || {};
+  return {
+    ...obj,
+    id: obj._id?.toString(),
+    // CSV para frontend
+    types: (obj.types || []).join(','),
+    // aplanadas
+    hp: obj.hp ?? s.hp,
+    attack: obj.attack ?? s.attack,
+    defense: obj.defense ?? s.defense,
+    sp_attack: obj.sp_attack ?? s.sp_attack,
+    sp_defense: obj.sp_defense ?? s.sp_defense,
+    speed: obj.speed ?? s.speed
+  };
+}
+
+/**
+ * GET /api/pokemon
+ */
 router.get('/', listQuery, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
@@ -26,74 +51,84 @@ router.get('/', listQuery, async (req, res) => {
   const data = await Pokemon.find(q)
     .sort({ nat_dex: 1 })
     .skip(skipN)
-    .limit(limitN)
-    .lean();
+    .limit(limitN);
 
-  // Para mantener compatibilidad con el frontend (CSV de tipos)
-  const mapped = data.map(p => ({ ...p, types: (p.types || []).join(',') }));
+  const mapped = data.map(flatten);
   res.json({ page: pageN, limit: limitN, data: mapped });
 });
 
-// GET /api/pokemon/:id (id de Mongo)
-router.get('/:id', idParam, async (req, res) => {
-  // idParam valida numérico, pero en Mongo el _id es ObjectId.
-  // Lo reemplazamos por una validación simple:
+/**
+ * GET /api/pokemon/:id
+ */
+router.get('/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const p = await Pokemon.findById(id).lean();
+    const p = await Pokemon.findById(id);
     if (!p) return res.status(404).json({ error: 'Pokémon no encontrado' });
-    p.types = (p.types || []).join(',');
-    res.json(p);
+    res.json(flatten(p));
   } catch {
     return res.status(400).json({ error: 'ID inválido' });
   }
 });
 
-// POST /api/pokemon (JWT)
+/**
+ * POST /api/pokemon
+ */
 router.post('/', authenticateToken, createPokemonValidator, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
   const { name, nat_dex, generation = 6, stats, types } = req.body;
+
   try {
     const created = await Pokemon.create({
-      name, nat_dex, generation,
+      name,
+      nat_dex,
+      generation,
       stats,
       types: (types || []).map(t => t.toLowerCase())
     });
-    res.status(201).json(created);
+    res.status(201).json(flatten(created));
   } catch (e) {
     const msg = e.code === 11000 ? 'nat_dex duplicado' : e.message;
     res.status(500).json({ error: 'Error al crear Pokémon', detail: msg });
   }
 });
 
-// PATCH /api/pokemon/:id (JWT)
+/**
+ * PATCH /api/pokemon/:id
+ */
 router.patch('/:id', authenticateToken, updatePokemonValidator, async (req, res) => {
   const { id } = req.params;
+
   const payload = {};
   if (req.body.name) payload.name = req.body.name;
   if (req.body.nat_dex) payload.nat_dex = req.body.nat_dex;
   if (req.body.generation) payload.generation = req.body.generation;
+
   if (req.body.stats) {
-    for (const k of ['hp','attack','defense','sp_attack','sp_defense','speed']) {
-      if (typeof req.body.stats[k] === 'number') {
-        payload[`stats.${k}`] = req.body.stats[k];
-      }
+    const s = req.body.stats;
+    for (const k of ['hp', 'attack', 'defense', 'sp_attack', 'sp_defense', 'speed']) {
+      if (typeof s[k] === 'number') payload[`stats.${k}`] = s[k];
     }
   }
-  if (Array.isArray(req.body.types)) payload.types = req.body.types.map(t => t.toLowerCase());
+
+  if (Array.isArray(req.body.types)) {
+    payload.types = req.body.types.map(t => t.toLowerCase());
+  }
 
   try {
     const updated = await Pokemon.findByIdAndUpdate(id, payload, { new: true });
     if (!updated) return res.status(404).json({ error: 'Pokémon no encontrado' });
-    res.json(updated);
+    res.json(flatten(updated));
   } catch (e) {
     res.status(400).json({ error: 'ID inválido o datos incorrectos', detail: e.message });
   }
 });
 
-// DELETE /api/pokemon/:id (JWT)
+/**
+ * DELETE /api/pokemon/:id
+ */
 router.delete('/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
   try {

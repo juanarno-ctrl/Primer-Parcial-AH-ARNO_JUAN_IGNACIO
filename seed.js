@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
+import mongoose from 'mongoose';
 import { connectDB } from './db.js';
 import User from './models/user.js';
 import Type from './models/type.js';
@@ -8,10 +9,15 @@ import Pokemon from './models/Pokemon.js';
 dotenv.config();
 
 async function seed() {
+  // Conectar usando la URL del .env
+  console.log('MONGODB_URI cargada?', !!process.env.MONGODB_URI);
   await connectDB(process.env.MONGODB_URI);
+  console.log('📦 Sembrando en DB:', mongoose.connection.name);
 
   // Tipos
-  const baseTypes = ['grass','fire','water','fairy','flying','dark','steel','ghost','fighting','psychic'];
+  const baseTypes = [
+    'grass','fire','water','fairy','flying','dark','steel','ghost','fighting','psychic'
+  ];
   await Type.deleteMany({});
   await Type.insertMany(baseTypes.map(name => ({ name })));
 
@@ -38,3 +44,4 @@ async function seed() {
 }
 
 seed().catch(err => { console.error(err); process.exit(1); });
+

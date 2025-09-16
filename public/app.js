@@ -45,9 +45,15 @@ function el(html) {
   return t.content.firstElementChild;
 }
 
-function typesToBadges(csv) {
-  if (!csv) return '';
-  return csv.split(',').map(t => `<span class="badge">${t}</span>`).join(' ');
+function typesToBadges(csvOrArr) {
+  if (!csvOrArr) return '';
+  const arr = Array.isArray(csvOrArr) ? csvOrArr : String(csvOrArr).split(',');
+  return arr.filter(Boolean).map(t => `<span class="badge">${t}</span>`).join(' ');
+}
+
+function statValue(p, key) {
+  // usa aplanado si viene, o recurre a p.stats
+  return p?.[key] ?? p?.stats?.[key] ?? '';
 }
 
 // ===== UI refs =====
@@ -129,19 +135,33 @@ function renderResults({ data = [], page, limit }) {
     return;
   }
 
-  const rows = data.map(p => `
-    <tr>
-      <td>#${p.nat_dex}</td>
-      <td>${p.name}</td>
-      <td>${typesToBadges(p.types)}</td>
-      <td>${p.hp}/${p.attack}/${p.defense}/${p.sp_attack}/${p.sp_defense}/${p.speed}</td>
-      <td>
-        <button data-id="${p.id}" class="secondary act-view">Ver</button>
-        <button data-id="${p.id}" class="primary act-edit" ${!token ? 'hidden' : ''}>Editar</button>
-        <button data-id="${p.id}" class="danger act-del" ${!token ? 'hidden' : ''}>Borrar</button>
-      </td>
-    </tr>
-  `).join('');
+  const rows = data.map(raw => {
+    // normalizar id
+    const id = raw.id || raw._id;
+    const p = raw; // ya puede venir aplanado desde el backend
+    const statsText = [
+      statValue(p, 'hp'),
+      statValue(p, 'attack'),
+      statValue(p, 'defense'),
+      statValue(p, 'sp_attack'),
+      statValue(p, 'sp_defense'),
+      statValue(p, 'speed'),
+    ].join('/');
+
+    return `
+      <tr>
+        <td>#${p.nat_dex}</td>
+        <td>${p.name}</td>
+        <td>${typesToBadges(p.types)}</td>
+        <td>${statsText}</td>
+        <td>
+          <button data-id="${id}" class="secondary act-view">Ver</button>
+          <button data-id="${id}" class="primary act-edit" ${!token ? 'hidden' : ''}>Editar</button>
+          <button data-id="${id}" class="danger act-del" ${!token ? 'hidden' : ''}>Borrar</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
 
   results.innerHTML = `
     <table class="table">
@@ -173,7 +193,7 @@ async function onView(e) {
   const id = e.currentTarget.dataset.id;
   try {
     const p = await fetchJSON(`${API}/pokemon/${id}`);
-    openDialogFor(p);
+    openDialogFor(p, false);
   } catch (err) {
     alert(`Error: ${err.message}`);
   }
@@ -206,18 +226,31 @@ async function onDelete(e) {
 // ===== CRUD Dialog =====
 function openDialogFor(p = null, editable = false) {
   dlgTitle.textContent = p ? (editable ? `Editar: ${p.name}` : `Ver: ${p.name}`) : 'Nuevo Pokémon';
-  pkId.value = p?.id ?? '';
+
+  // modo para cancelar sin submit
+  frmPokemon.dataset.mode = p ? (editable ? 'edit' : 'view') : 'create';
+
+  const id = p?.id || p?._id || '';
+  pkId.value = id;
   pkName.value = p?.name ?? '';
   pkDex.value = p?.nat_dex ?? '';
-  sHp.value = p?.hp ?? '';
-  sAtk.value = p?.attack ?? '';
-  sDef.value = p?.defense ?? '';
-  sSpA.value = p?.sp_attack ?? '';
-  sSpD.value = p?.sp_defense ?? '';
-  sSpe.value = p?.speed ?? '';
-  pkTypes.value = p?.types ?? '';
 
-  // Si es "ver" y no editable, deshabilitar inputs
+  // rellenar stats (aplanadas o desde p.stats)
+  sHp.value  = statValue(p, 'hp');
+  sAtk.value = statValue(p, 'attack');
+  sDef.value = statValue(p, 'defense');
+  sSpA.value = statValue(p, 'sp_attack');
+  sSpD.value = statValue(p, 'sp_defense');
+  sSpe.value = statValue(p, 'speed');
+
+  // tipos: aceptar csv o array
+  if (Array.isArray(p?.types)) {
+    pkTypes.value = p.types.join(',');
+  } else {
+    pkTypes.value = p?.types ?? '';
+  }
+
+  // si es “ver”, deshabilitar inputs y ocultar Guardar
   const disabled = p && !editable;
   [...frmPokemon.querySelectorAll('input')].forEach(i => i.disabled = disabled);
   frmPokemon.querySelector('#btnSave').hidden = disabled;
@@ -227,8 +260,21 @@ function openDialogFor(p = null, editable = false) {
 
 btnNew.addEventListener('click', () => openDialogFor(null, true));
 
+// Botón Cancelar del diálogo: cerramos sin submit
+frmPokemon.querySelector('.secondary')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  dlgPokemon.close();
+});
+
 frmPokemon.addEventListener('submit', async (e) => {
   e.preventDefault();
+
+  // Si el submitter es "Cancelar" o estamos en modo 'view', solo cerrar
+  if ((e.submitter && e.submitter.classList.contains('secondary')) || frmPokemon.dataset.mode === 'view') {
+    dlgPokemon.close();
+    return;
+  }
+
   const id = pkId.value;
   const body = {
     name: pkName.value.trim(),
@@ -331,10 +377,14 @@ frmRegister.addEventListener('submit', async (e) => {
   try {
     await fetchJSON(`${API}/auth/register`, {
       method: 'POST',
-      body: JSON.stringify({ name: rgName.value.trim(), email: rgEmail.value.trim(), password: rgPass.value })
+      body: JSON.stringify({
+        name: rgName.value.trim(),
+        email: rgEmail.value.trim(),
+        password: rgPass.value
+      })
     });
     dlgRegister.close();
-    // opcional: loguear automáticamente
+    // Login automático
     const { token: tk } = await fetchJSON(`${API}/auth/login`, {
       method: 'POST',
       body: JSON.stringify({ email: rgEmail.value.trim(), password: rgPass.value })
